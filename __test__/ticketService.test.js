@@ -45,4 +45,29 @@ describe("User Service Tests", () =>{
         expect(ticketDAO.createTicket).toHaveBeenCalledWith(mockResult);
     });
 
+    test("should return pending tickets for Manager role", async () => {
+        const mockTickets = [
+            { id: 1, status: "Pending", title: "Ticket 1" },
+            { id: 2, status: "Pending", title: "Ticket 2" }
+        ];
+        
+        ticketDAO.getTicketsByStatus.mockResolvedValue(mockTickets); // Mock return value
+        
+        const user = { role_id: "Manager" };
+        const tickets = await ticketService.getPendingTickets(user);
+
+        expect(ticketDAO.getTicketsByStatus).toHaveBeenCalledWith("Pending"); // Ensure function was called
+        expect(tickets).toEqual(mockTickets); // Ensure correct return value
+    });
+
+    test("should throw an error if ticketDAO fails", async () => {
+        ticketDAO.getTicketsByStatus.mockRejectedValue(new Error("Database error"));
+
+        const user = { role_id: "Manager" };
+
+        await expect(ticketService.getPendingTickets(user)).rejects.toThrow("Service: Failed to fetch pending tickets");
+
+        expect(ticketDAO.getTicketsByStatus).toHaveBeenCalledWith("Pending");
+    });
+
 });

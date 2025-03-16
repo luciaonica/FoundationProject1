@@ -5,7 +5,7 @@ const {logger} = require("../util/logger");
 async function createTicket(ticket) {
     try {
         if(ticket.amount <= 0){
-            logger.error("Amount cannot be negative");
+            logger.info("Amount cannot be negative");
             return { success: false, message: "Amount cannot be negative" };
         }
     
@@ -27,11 +27,18 @@ async function createTicket(ticket) {
     } catch (err) {
         logger.error(`Error in createTicket: ${err.message}`);
         return { success: false, message: "An unexpected error occurred" };
-    }
-
-    
-   
-      
+    }     
 }
 
-module.exports = { createTicket}
+async function getPendingTickets(user) {    
+
+    try {
+        const tickets = await ticketDAO.getTicketsByStatus("Pending");
+        return tickets;
+    } catch (err) {
+        logger.error(`Error in getPendingTickets: ${err.message}`);
+        throw new Error("Service: Failed to fetch pending tickets");
+    }
+}
+
+module.exports = { createTicket, getPendingTickets}

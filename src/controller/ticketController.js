@@ -17,6 +17,25 @@ router.post("/", authenticateToken, validateTicketMiddleware, async (req,res) =>
     }        
 });
 
+router.get("/pending", authenticateToken, authorizeRole(["Manager"]), async (req, res) => {
+    try {
+        const tickets = await ticketService.getPendingTickets(req.user);
+        res.status(200).json(tickets);
+    } catch (err) {
+        logger.error(`Error retrieving pending tickets: ${err.message}`);
+        res.status(403).json(err.message);
+    }
+});
+
+function authorizeRole(allowedRoles) {
+    return (req, res, next) => {
+        if (!allowedRoles.includes(req.user.role_id)) {
+            return res.status(403).json({ error: "Unauthorized: Employees cannot view all pending tickets." });
+        }
+        next();
+    };
+}
+
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];

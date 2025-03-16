@@ -22,4 +22,24 @@ async function createTicket(ticket) {
     }    
 }
 
-module.exports = { createTicket}
+async function getTicketsByStatus(status) {
+    
+    const command = new QueryCommand({
+        TableName,
+        IndexName: "status-index", // GSI for "status"
+        KeyConditionExpression: "#s = :s",
+        ExpressionAttributeNames: { "#s": "status" }, // Alias for "status"
+        ExpressionAttributeValues: { ":s": status }
+    });
+
+    try {
+        const { Items } = await documentClient.send(command);
+        logger.info(`Retrieved ${Items.length} tickets with status ${status}`);
+        return Items;
+    } catch (err) {
+        logger.error("Error fetching tickets by status", err.message);
+        throw new Error("DAO: Failed to retrieve tickets by status");
+    }
+}
+
+module.exports = { createTicket, getTicketsByStatus}

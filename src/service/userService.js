@@ -8,14 +8,14 @@ async function postUser(user) {
     try {
 
         if(!validateUser(user)) {
-            logger.error("Username and Password must be longer than 4 characters");
+            logger.info("Username and Password must be longer than 4 characters");
             return { success: false, message: "Username and Password must be longer than 4 characters" };
         }
 
         const existingUser = await userDAO.getUserByUsername(user.username);
 
         if(existingUser){
-            logger.error("Username already exists");
+            logger.info("Username already exists");
             return { success: false, message: "Username already exists" };
         }        
 
