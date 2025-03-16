@@ -43,8 +43,30 @@ async function postUser(user) {
     }    
 }
 
+async function validateLogin(username, password) {
+    const user = await getUserByUsername(username);
+    if(user && (await bcrypt.compare(password, user.password))){
+        return user;
+    } else {
+        return null;
+    }
+}
+
+async function getUserByUsername(username) {
+    if(username) {
+        const data = await userDAO.getUserByUsername(username);
+        if (data) {
+            return data;
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+
 function validateUser(user) {
     return user.username.length > 4 && user.password.length > 4;
 }
 
-module.exports = {postUser}
+module.exports = {postUser, validateLogin, getUserByUsername}
