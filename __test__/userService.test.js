@@ -36,7 +36,7 @@ describe("User Service Tests", () =>{
     test("postUser should return error if username/password is too short", async () => {
         const response = await userService.postUser({ username: "abc", password: "123" });
 
-        expect(response).toEqual({ success: false, message: "Username and Password must be more than 4 characters" });
+        expect(response).toEqual({ success: false, message: "Username and Password must be longer than 4 characters" });
     });
 
     test("getUserByUsername should return user data", async () => {
